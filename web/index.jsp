@@ -1,17 +1,9 @@
-<%-- 
-    Document   : index
-    Created on : Feb 21, 2026, 10:44:35 PM
-    Author     : mihir
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-    </body>
-</html>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+    // Redirect to login if not logged in, otherwise to dashboard
+    if (session.getAttribute("user") != null) {
+        response.sendRedirect("dashboard");
+    } else {
+        response.sendRedirect("login.jsp");
+    }
+%>
