@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
-    
     <display-name>Attendance Management System</display-name>
-    
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
-    
+    <servlet-mapping>
+        <servlet-name>TestDBConnection</servlet-name>
+        <url-pattern>/TestDBConnection</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TestDBServlet</servlet-name>
+        <url-pattern>/TestDBServlet</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-    
     <error-page>
         <error-code>404</error-code>
         <location>/error.jsp</location>
     </error-page>
-    
     <error-page>
         <error-code>500</error-code>
         <location>/error.jsp</location>
     </error-page>
-    
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>controller.LoginServlet</servlet-class>
@@ -52,6 +54,14 @@
     <servlet>
         <servlet-name>RegisterServlet</servlet-name>
         <servlet-class>controller.RegisterServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TestDBConnection</servlet-name>
+        <servlet-class>controller.TestDBConnection</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TestDBServlet</servlet-name>
+        <servlet-class>controller.TestDBServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
