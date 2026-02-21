@@ -1,85 +1,156 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import dao.StudentDAO;
+import model.Student;
+import model.User;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.List;
 
-/**
- *
- * @author mihir
- */
+@WebServlet("/students")
 public class StudentServlet extends HttpServlet {
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet StudentServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet StudentServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+    private StudentDAO studentDAO;
+    
+    @Override
+    public void init() {
+        studentDAO = new StudentDAO();
     }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        
+        // Check if user is logged in
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        String action = request.getParameter("action");
+        
+        if (action == null) {
+            action = "list";
+        }
+        
+        switch (action) {
+            case "add":
+                showAddForm(request, response);
+                break;
+            case "edit":
+                showEditForm(request, response);
+                break;
+            case "delete":
+                deleteStudent(request, response);
+                break;
+            default:
+                listStudents(request, response);
+                break;
+        }
     }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        String action = request.getParameter("action");
+        
+        if ("add".equals(action)) {
+            addStudent(request, response);
+        } else if ("update".equals(action)) {
+            updateStudent(request, response);
+        }
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+    
+    private void listStudents(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<Student> students = studentDAO.getAllStudents();
+        request.setAttribute("students", students);
+        request.getRequestDispatcher("students.jsp").forward(request, response);
+    }
+    
+    private void showAddForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher("add-student.jsp").forward(request, response);
+    }
+    
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        Student student = studentDAO.getStudentById(id);
+        request.setAttribute("student", student);
+        request.getRequestDispatcher("edit-student.jsp").forward(request, response);
+    }
+    
+    private void addStudent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        
+        Student student = new Student();
+        student.setRollNumber(request.getParameter("rollNumber"));
+        student.setName(request.getParameter("name"));
+        student.setEmail(request.getParameter("email"));
+        student.setPhone(request.getParameter("phone"));
+        student.setDepartment(request.getParameter("department"));
+        student.setSemester(Integer.parseInt(request.getParameter("semester")));
+        student.setCreatedBy(user.getUserId());
+        
+        boolean success = studentDAO.addStudent(student);
+        
+        if (success) {
+            request.setAttribute("success", "Student added successfully!");
+        } else {
+            request.setAttribute("error", "Failed to add student!");
+        }
+        
+        response.sendRedirect("students?action=list");
+    }
+    
+    private void updateStudent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        Student student = new Student();
+        student.setStudentId(Integer.parseInt(request.getParameter("studentId")));
+        student.setRollNumber(request.getParameter("rollNumber"));
+        student.setName(request.getParameter("name"));
+        student.setEmail(request.getParameter("email"));
+        student.setPhone(request.getParameter("phone"));
+        student.setDepartment(request.getParameter("department"));
+        student.setSemester(Integer.parseInt(request.getParameter("semester")));
+        
+        boolean success = studentDAO.updateStudent(student);
+        
+        if (success) {
+            request.setAttribute("success", "Student updated successfully!");
+        } else {
+            request.setAttribute("error", "Failed to update student!");
+        }
+        
+        response.sendRedirect("students?action=list");
+    }
+    
+    private void deleteStudent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        int id = Integer.parseInt(request.getParameter("id"));
+        boolean success = studentDAO.deleteStudent(id);
+        
+        if (success) {
+            request.setAttribute("success", "Student deleted successfully!");
+        } else {
+            request.setAttribute("error", "Failed to delete student!");
+        }
+        
+        response.sendRedirect("students?action=list");
+    }
 }
