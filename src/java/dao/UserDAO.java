@@ -12,8 +12,14 @@ public class UserDAO {
         User user = null;
         String query = "SELECT * FROM users WHERE username = ? AND password = ?";
         
+        System.out.println("=== UserDAO.validateUser ===");
+        System.out.println("Attempting to validate user: " + username);
+        
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            System.out.println("Database connection obtained");
+            System.out.println("Executing query: " + query);
             
             pstmt.setString(1, username);
             pstmt.setString(2, password);
@@ -21,6 +27,7 @@ public class UserDAO {
             ResultSet rs = pstmt.executeQuery();
             
             if (rs.next()) {
+                System.out.println("User found in database!");
                 user = new User();
                 user.setUserId(rs.getInt("user_id"));
                 user.setUsername(rs.getString("username"));
@@ -28,8 +35,16 @@ public class UserDAO {
                 user.setEmail(rs.getString("email"));
                 user.setRole(rs.getString("role"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
+                
+                System.out.println("User details: ID=" + user.getUserId() + 
+                                 ", Name=" + user.getFullName() + 
+                                 ", Role=" + user.getRole());
+            } else {
+                System.out.println("No user found with given credentials");
             }
+            
         } catch (SQLException e) {
+            System.err.println("SQL Error in validateUser:");
             e.printStackTrace();
         }
         

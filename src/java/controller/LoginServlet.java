@@ -14,6 +14,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     public void init() {
         userDAO = new UserDAO();
+        System.out.println("LoginServlet initialized");
     }
     
     @Override
@@ -30,10 +31,17 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         
+        // Debug logging
+        System.out.println("=== Login Attempt ===");
+        System.out.println("Username: " + username);
+        System.out.println("Password: " + password);
+        
         // Validate user
         User user = userDAO.validateUser(username, password);
         
         if (user != null) {
+            System.out.println("Login successful for user: " + username);
+            
             // Create session
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
@@ -43,9 +51,13 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("role", user.getRole());
             session.setMaxInactiveInterval(30 * 60); // 30 minutes
             
+            System.out.println("Session created. Redirecting to dashboard...");
+            
             // Redirect to dashboard
             response.sendRedirect("dashboard");
         } else {
+            System.out.println("Login failed for user: " + username);
+            
             // Login failed
             request.setAttribute("error", "Invalid username or password!");
             request.getRequestDispatcher("login.jsp").forward(request, response);
