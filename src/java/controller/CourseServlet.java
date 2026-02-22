@@ -1,5 +1,6 @@
 package controller;
 
+import java.util.*;
 import dao.CourseDAO;
 import dao.UserDAO;
 import model.Course;
@@ -74,11 +75,19 @@ public class CourseServlet extends HttpServlet {
     }
     
     private void listCourses(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
+    try {
         List<Course> courses = courseDAO.getAllCourses();
+        if (courses == null) {
+            courses = new ArrayList<>();
+        }
         request.setAttribute("courses", courses);
-        request.getRequestDispatcher("courses.jsp").forward(request, response);
+        request.getRequestDispatcher("course.jsp").forward(request, response);
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.sendRedirect("error.jsp");
     }
+}
     
     private void showAddForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
