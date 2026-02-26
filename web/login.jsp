@@ -43,11 +43,11 @@
                 Don't have an account? <a href="register.jsp" style="color: #667eea;">Register here</a>
             </p>
             
-            <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+<!--            <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
                 <p style="margin: 5px 0; font-size: 12px;"><strong>Demo Credentials:</strong></p>
                 <p style="margin: 5px 0; font-size: 12px;">Admin - Username: admin, Password: admin123</p>
                 <p style="margin: 5px 0; font-size: 12px;">Teacher - Username: teacher1, Password: teacher123</p>
-            </div>
+            </div>-->
         </div>
     </div>
 </body>
